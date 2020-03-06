@@ -16,7 +16,8 @@ class CfgFunctions
 				postInit = 1;
 				recompile = 1;
 			};
-			class combatZones
+			class defaultRange;
+			class baseStore
 			{
 				postInit = 1;
 				recompile = 1;
