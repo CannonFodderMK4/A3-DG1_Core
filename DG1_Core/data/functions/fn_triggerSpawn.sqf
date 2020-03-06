@@ -103,9 +103,18 @@
 			//Get trigger defines
 			_sideClass = ((triggerText _this) splitString ",. ") select 0;
 			_squad = ((triggerText _this) splitString ",. ") select 1;
-			_baseDist = ((triggerText _this) splitString ",. ") select 2;
+			_baseDist = 0;
 			_basePos = position _this;
 			_rad = (triggerArea _this) select 0;
+			
+			if (count (_trigTxt splitString "., ") > 2) then
+			{
+				_baseDist = (_trigTxt splitString "., ") select 2;
+			}
+			else
+			{
+				_baseDist = [] call DG1_fnc_defaultRange;
+			};
 			
 			//get waypoints and save for repeated use
 			_waypointPositions = [];

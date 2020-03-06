@@ -129,10 +129,11 @@ _face = param [5,false,[[],false]];
 _Pweapon = param [6,false,[[],false]];
 _Sweapon = param [7,false,[[],false]];
 _Tweapon = param [8,false,[[],false]];
-_inv = param [9,false,[[],false,""]];
+_nvg = param [9,false,[[],false,""]];
+_inv = param [10,false,[[],false,""]];
 
 //Ignore script during 3den editor & if custom loadout has been set.
-if (is3DEN || _unit getVariable ["saved3DDENInventory",false]) exitWith {};
+if (_unit getVariable ["saved3DDENInventory",false]) exitWith {};
 
 //check for local status
 if (isMultiplayer && !(local _unit)) exitWith {false};
@@ -398,7 +399,7 @@ if !(_Pweapon isEqualTo false) then
 	}
 	else
 	{
-		if (_TweaponToUse == "NO_WEAPON") then
+		if (_PweaponToUse == "NO_WEAPON") then
 		{
 			_pWeap = primaryWeapon _unit;
 			if !(_pWeap == "") then {
@@ -498,6 +499,48 @@ if !(_Tweapon isEqualTo false) then
 			if !(_tWeap == "") then {
 				_unit removeWeapon _tWeap;
 			};
+		};
+	};
+};
+
+if !(_nvg isEqualTo false) then 
+{
+	_nvgToUse = "";
+	private ["_nvgList","_nvgPool","_probabilityPool"];
+	if (_nvg isEqualType []) then
+	{
+		if (count _nvg >= 1) then
+		{
+			_nvgList = _nvg;
+		}
+		else
+		{
+			_nvgList = getArray(configFile >> "CfgVehicles" >> _unitType >> "nvgList");
+		};
+		if (count _nvgList >= 2 && {(_nvgList select 1) isEqualType 0}) then
+		{
+			_nvgPool = [];
+			_probabilityPool = [];
+			for "_i" from 0 to (count _nvgList -1) step 2 do
+			{
+				_nvgPool append [_nvgList select _i];
+				_probabilityPool append [_nvgList select (_i +1)];
+			};
+			_nvgToUse = [_nvgPool, _probabilityPool] call BIS_fnc_selectRandomWeighted;
+		};
+	};
+	if (isClass (configFile >> "cfgGlasses" >> _nvgToUse)) then
+	{
+		_equipped = hmd _unit;
+		_unit unlinkItem _equipped;
+		_unit linkItem _nvgToUse;
+	}
+	else
+	{
+		if (_nvgToUse == "NO_NVG") then
+		{
+			_equipped = hmd _unit;
+			_unit unlinkItem _equipped;;
 		};
 	};
 };
